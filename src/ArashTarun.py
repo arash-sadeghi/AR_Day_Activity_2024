@@ -3,7 +3,7 @@ from src.DriveState import DriveState
 from src.Constants import DriveMove, SensorData
 from src.Utils import manhattan_dist_2D
 import math
-class YourAgent(DriveInterface):
+class ArashTarun(DriveInterface):
 
     def __init__(self, game_id: int, is_advanced_mode: bool):
         """
@@ -76,6 +76,9 @@ class YourAgent(DriveInterface):
 
     def will_next_state_collide(self, state: DriveState, sensor_data: dict) -> bool:
         # Not implemented yet
+        for rob_locs in sensor_data[SensorData.DRIVE_LOCATIONS]:
+            if rob_locs[0] == state.x and rob_locs[1] == state.y:
+                return True
         return False
 
     def get_move_for_next_state_in_path(self) -> DriveMove:
