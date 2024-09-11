@@ -19,6 +19,7 @@ class ArashTarun(DriveInterface):
         self.path = []
         self.field_limits = []
         self.path_move_index = 0
+        self.NEED_DROP = False
 
 
     # This is the main function the simulator will call each turn
@@ -59,7 +60,9 @@ class ArashTarun(DriveInterface):
         if len(self.path) == 0:
             if self.need_to_find_target_pod:
                 # Advanced mode - Need to find the target pod and bring it to the goal
-                raise Exception('Advanced mode solver not implemented yet for DfsSolverAgent')
+                # raise Exception('Advanced mode solver not implemented yet for DfsSolverAgent')
+                goal_target_pod = sensor_data[SensorData.TARGET_POD_LOCATION]
+                self.dfs_solve_path_to_goal(sensor_data,goal_target_pod)
             else:
                 # This example uses the first goal location in the list.
                 goal = self.select_closest_goal(sensor_data[SensorData.GOAL_LOCATIONS] , sensor_data[SensorData.PLAYER_LOCATION]) #!
@@ -90,6 +93,14 @@ class ArashTarun(DriveInterface):
         for move in DriveMove:
             if current_state.get_next_state_from_move(move) == next_state.to_tuple():
                 return move, next_state
+
+        if self.need_to_find_target_pod:
+            self.need_to_find_target_pod = False
+            self.NEED_DROP = True         
+            return DriveMove.LIFT_POD , next_state
+        
+        if self.NEED_DROP:
+            return DriveMove.DROP_POD , next_state
 
         print('WARN next move could not be found')
         return DriveMove.NONE, next_state
