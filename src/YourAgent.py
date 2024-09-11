@@ -64,7 +64,7 @@ class YourAgent(DriveInterface):
                 # This example uses the first goal location in the list.
                 goal = self.select_closest_goal(sensor_data[SensorData.GOAL_LOCATIONS] , sensor_data[SensorData.PLAYER_LOCATION]) #!
                 print(f"[+] goal {goal}")
-                self.dfs_solve_path_to_goal(sensor_data, sensor_data[SensorData.GOAL_LOCATIONS][0])
+                self.dfs_solve_path_to_goal(sensor_data,goal)
 
         next_move, next_state = self.get_move_for_next_state_in_path()
         if self.will_next_state_collide(next_state, sensor_data):
@@ -100,7 +100,7 @@ class YourAgent(DriveInterface):
         paths = [[DriveState(x=start_state[0], y=start_state[1])]]
 
         while len(paths) > 0:
-            current_path = paths.pop(len(paths)-1)
+            current_path = self.select_open_node(paths,goal)
             curr_state = current_path[-1]
             if curr_state.x == goal[0] and curr_state.y == goal[1]:
                 self.path = current_path
@@ -137,3 +137,12 @@ class YourAgent(DriveInterface):
         for goal in goal_list:
             dists.append(math.sqrt((goal[0]-current_location[0])**2 + (goal[1]-current_location[1])**2))
         return goal_list[dists.index(min(dists))]
+    
+    def select_open_node(self,paths,goal):
+        # next_node = paths.pop(len(paths)-1)
+        dists = []
+        for path  in paths:
+            node = path[-1]
+            dists.append(math.sqrt((goal[0]-node.x)**2 + (goal[1]-node.y)**2))
+        next_node = paths.pop(dists.index(min(dists)))
+        return next_node
